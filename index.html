@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lista de la compra</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%BE%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css">
+<!-- ?v=N evita que el móvil se quede con una copia en caché de una
+     versión anterior: sube el número cada vez que cambies style.css
+     o app.js, o el navegador podría no notar que hay una nueva. -->
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 <div class="page">
@@ -57,6 +60,6 @@
   </div>
 </div>
 
-<script src="app.js"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>
