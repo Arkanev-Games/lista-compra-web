@@ -7,215 +7,253 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%BE%3C/text%3E%3C/svg%3E">
 <style>
   :root {
-    --paper: #f4f5f0;
-    --paper-raised: #ffffff;
-    --ink: #1b211c;
-    --muted: #6e756b;
-    --line: #d8dad1;
+    --bg: #f6f7f2;
+    --surface: #ffffff;
+    --surface-2: #eaece3;
+    --ink: #1c231d;
+    --muted: #6d7568;
+    --border: #e3e6dc;
     --accent: #2f6b4f;
+    --accent-strong: #21513a;
     --accent-ink: #ffffff;
-    --warm: #c85a34;
-    --shadow: rgba(27, 33, 28, 0.10);
+    --shadow: rgba(28, 35, 29, 0.08);
     --focus: #2f6b4f;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --paper: #13160f;
-      --paper-raised: #1b2018;
-      --ink: #edefe7;
-      --muted: #9ba294;
-      --line: #2a2f26;
+      --bg: #12140f;
+      --surface: #1c2018;
+      --surface-2: #262b21;
+      --ink: #edefe6;
+      --muted: #9aa192;
+      --border: #2c3127;
       --accent: #5cae83;
+      --accent-strong: #7ecb9f;
       --accent-ink: #0b140e;
-      --warm: #e6835a;
-      --shadow: rgba(0, 0, 0, 0.45);
+      --shadow: rgba(0, 0, 0, 0.4);
       --focus: #5cae83;
     }
   }
 
   :root[data-theme="dark"] {
-    --paper: #13160f;
-    --paper-raised: #1b2018;
-    --ink: #edefe7;
-    --muted: #9ba294;
-    --line: #2a2f26;
+    --bg: #12140f;
+    --surface: #1c2018;
+    --surface-2: #262b21;
+    --ink: #edefe6;
+    --muted: #9aa192;
+    --border: #2c3127;
     --accent: #5cae83;
+    --accent-strong: #7ecb9f;
     --accent-ink: #0b140e;
-    --warm: #e6835a;
-    --shadow: rgba(0, 0, 0, 0.45);
+    --shadow: rgba(0, 0, 0, 0.4);
     --focus: #5cae83;
   }
 
   * { box-sizing: border-box; }
 
-  html { background: var(--paper); }
+  html { background: var(--bg); }
 
   body {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
-    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Roboto, Arial, sans-serif;
     font-size: 15px;
     line-height: 1.5;
     margin: 0;
-    padding: 40px 16px 80px;
+    padding: 28px 16px 60px;
     -webkit-font-smoothing: antialiased;
   }
 
   .mono {
     font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Consolas, monospace;
+    font-variant-numeric: tabular-nums;
   }
 
-  .page {
-    max-width: 460px;
-    margin: 0 auto;
-  }
+  .page { max-width: 460px; margin: 0 auto; }
 
-  .topbar {
+  .appbar {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    margin-bottom: 22px;
-    gap: 12px;
+    margin-bottom: 18px;
   }
 
-  .eyebrow {
-    font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Consolas, monospace;
-    font-size: 11px;
+  .brand {
+    font-size: 12.5px;
     letter-spacing: 0.09em;
     text-transform: uppercase;
     color: var(--muted);
+    font-weight: 700;
   }
 
-  .linklike {
+  .refresh-btn {
     background: none;
     border: none;
     padding: 0;
     color: var(--accent);
     font-size: 13px;
+    font-weight: 600;
     font-family: inherit;
     cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 2px;
   }
 
-  h1 {
-    font-size: 22px;
-    line-height: 1.25;
-    margin: 0 0 10px;
-    text-wrap: balance;
-    letter-spacing: -0.01em;
+  .segmented {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--surface-2);
+    border-radius: 13px;
+    padding: 4px;
+    margin-bottom: 20px;
   }
+
+  .seg-highlight {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    height: calc(100% - 8px);
+    background: var(--accent);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px var(--shadow);
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+  }
+
+  .seg-highlight.pos-1 { transform: translateX(100%); }
+
+  .seg-btn {
+    position: relative;
+    z-index: 1;
+    border: none;
+    background: transparent;
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 9px;
+    font-family: inherit;
+    transition: color 0.25s ease;
+  }
+
+  .seg-btn[aria-selected="true"] { color: var(--accent-ink); }
 
   .lede {
     color: var(--muted);
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.55;
-    margin: 0 0 26px;
+    margin: 0 0 18px;
   }
 
   .lede strong { color: var(--ink); font-weight: 600; }
 
-  .ticket {
-    position: relative;
-    background: var(--paper-raised);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 22px 22px 30px;
-    box-shadow: 0 1px 2px var(--shadow), 0 8px 20px -12px var(--shadow);
-    margin-bottom: 20px;
+  .state-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    text-align: center;
   }
 
-  .ticket::after {
-    content: "";
-    position: absolute;
-    left: 1px;
-    right: 1px;
-    bottom: -9px;
-    height: 16px;
-    background:
-      linear-gradient(-45deg, var(--paper) 8px, transparent 0),
-      linear-gradient(45deg, var(--paper) 8px, transparent 0);
-    background-size: 16px 16px;
-    background-position: left bottom;
-    background-repeat: repeat-x;
+  .state-card.error { border-color: var(--accent-strong); color: var(--accent-strong); }
+
+  .progress-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px var(--shadow);
   }
 
-  .ticket-head {
+  .progress-row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 4px;
-  }
-
-  .ticket-title {
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    margin-bottom: 9px;
+    font-size: 13px;
     color: var(--muted);
   }
 
-  .tear-divider {
-    border-top: 1px dashed var(--line);
-    margin: 18px 0;
+  .progress-track {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--surface-2);
+    overflow: hidden;
   }
 
-  .menu-row {
-    display: grid;
-    grid-template-columns: 34px 1fr;
-    gap: 2px 10px;
-    padding: 6px 0;
-    font-size: 13.5px;
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+    transition: width 0.4s ease;
   }
 
-  .menu-day {
-    font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Consolas, monospace;
-    font-size: 11px;
-    color: var(--muted);
-    padding-top: 2px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+  .cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 2px var(--shadow);
   }
 
-  .menu-slots { display: flex; flex-direction: column; gap: 3px; }
-  .menu-slot { display: flex; gap: 6px; }
-  .menu-slot .tag {
-    font-size: 10.5px;
-    color: var(--muted);
-    width: 44px;
+  .cat-header {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 15px 16px;
+    cursor: pointer;
+  }
+
+  .cat-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .cat-name { flex: 1; font-size: 15px; font-weight: 600; }
+  .cat-count { font-size: 12px; color: var(--muted); }
+
+  .chevron {
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(-45deg);
+    transition: transform 0.25s ease;
     flex: none;
-    padding-top: 1px;
+    margin-right: 2px;
   }
 
-  .cat-block { margin-bottom: 16px; }
-  .cat-block:last-child { margin-bottom: 0; }
+  .cat-header[aria-expanded="true"] .chevron { transform: rotate(45deg); }
 
-  .cat-label {
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 6px;
-    font-weight: 600;
+  .cat-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+  }
+
+  .cat-panel.open { grid-template-rows: 1fr; }
+
+  .cat-panel-inner { overflow: hidden; min-height: 0; }
+
+  .cat-items {
+    padding: 4px 16px 8px;
+    border-top: 1px solid var(--border);
   }
 
   :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-
-  .progress {
-    font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Consolas, monospace;
-    font-size: 12px;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-    margin-bottom: 4px;
-  }
 
   .item-row {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 9px 2px;
+    padding: 10px 2px;
     cursor: pointer;
-    min-height: 44px;
+    min-height: 46px;
   }
 
   .item-row input {
@@ -226,18 +264,20 @@
   }
 
   .check-box {
-    width: 20px;
-    height: 20px;
+    width: 21px;
+    height: 21px;
     flex: none;
-    border: 1.5px solid var(--line);
-    border-radius: 4px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
     position: relative;
-    background: var(--paper-raised);
+    background: var(--surface);
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
   }
 
   .item-row input:checked ~ .check-box {
     background: var(--accent);
     border-color: var(--accent);
+    transform: scale(1.05);
   }
 
   .check-box::after {
@@ -245,20 +285,18 @@
     position: absolute;
     left: 6px;
     top: 2px;
-    width: 5px;
-    height: 10px;
+    width: 6px;
+    height: 11px;
     border: solid var(--accent-ink);
     border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+    transform: rotate(45deg) scale(0.6);
     opacity: 0;
+    transition: opacity 0.12s ease, transform 0.12s ease;
   }
 
-  .item-row input:checked ~ .check-box::after { opacity: 1; }
+  .item-row input:checked ~ .check-box::after { opacity: 1; transform: rotate(45deg) scale(1); }
 
-  .item-row input:focus-visible ~ .check-box {
-    outline: 2px solid var(--focus);
-    outline-offset: 2px;
-  }
+  .item-row input:focus-visible ~ .check-box { outline: 2px solid var(--focus); outline-offset: 2px; }
 
   .item-text { flex: 1; min-width: 0; }
   .item-name { font-size: 14.5px; }
@@ -269,22 +307,45 @@
     color: var(--muted);
   }
 
-  .viewer-menu {
+  .day-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 2px var(--shadow);
+  }
+
+  .day-name {
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .day-slot {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 14.5px;
   }
 
-  .state-box {
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 20px;
-    font-size: 13.5px;
+  .day-slot .tag {
+    width: 58px;
+    flex: none;
     color: var(--muted);
-    line-height: 1.6;
+    font-size: 12px;
+    padding-top: 2px;
   }
 
-  .state-box.error { border-color: var(--warm); color: var(--warm); }
+  #content { animation: fade-in 0.25s ease; }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
@@ -293,23 +354,42 @@
 </head>
 <body>
 <div class="page">
-  <div class="topbar">
-    <span class="eyebrow">Lista de la compra</span>
-    <button id="btn-refresh" class="linklike" type="button">Actualizar</button>
+  <div class="appbar">
+    <span class="brand">Menú de la semana</span>
+    <button id="btn-refresh" class="refresh-btn" type="button">Actualizar</button>
   </div>
 
-  <div id="state-loading" class="state-box">Cargando la lista…</div>
+  <div class="segmented" role="tablist">
+    <button class="seg-btn" data-view="compra" role="tab" aria-selected="true" type="button">Compra</button>
+    <button class="seg-btn" data-view="menu" role="tab" aria-selected="false" type="button">Menú</button>
+    <div id="seg-highlight" class="seg-highlight" aria-hidden="true"></div>
+  </div>
 
-  <div id="state-empty" class="state-box" hidden>
+  <div id="state-loading" class="state-card">Cargando la lista…</div>
+
+  <div id="state-empty" class="state-card" hidden>
     Todavía no se ha generado ninguna lista desde el escritorio. En cuanto pulses
     «Generar lista de la compra» en la app, aparecerá aquí sola.
   </div>
 
-  <div id="state-error" class="state-box error" hidden></div>
+  <div id="state-error" class="state-card error" hidden></div>
 
-  <div id="state-content" hidden>
+  <div id="content" hidden>
     <p class="lede" id="lede"></p>
-    <div class="ticket" id="ticket"></div>
+
+    <section id="view-compra">
+      <div class="progress-card">
+        <div class="progress-row">
+          <span id="progress-text" class="mono">0 / 0 marcados</span>
+        </div>
+        <div class="progress-track"><div id="progress-fill" class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div id="accordion"></div>
+    </section>
+
+    <section id="view-menu" hidden>
+      <div id="menu-list"></div>
+    </section>
   </div>
 </div>
 
@@ -317,63 +397,99 @@
 (function () {
   "use strict";
 
+  var CAT_COLORS = {
+    verduras: "#4b8b5f",
+    frutas: "#e0663f",
+    carne: "#b5533f",
+    pescado: "#3c7ea6",
+    lacteos_huevos: "#e0b94a",
+    pan_cereales: "#ad8a55",
+    legumbres_conservas: "#7d7440",
+    congelados: "#4fa3ab",
+    aceites_condimentos: "#cf8b2e",
+    otros: "#8a8f83"
+  };
+
+  var savedChecks = {};
+  var storageKey = "compra_sin-fecha";
+
+  function loadSaved(key) {
+    try { return JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) { return {}; }
+  }
+
+  function persistSaved() {
+    try { localStorage.setItem(storageKey, JSON.stringify(savedChecks)); } catch (e) {}
+  }
+
+  // --- Vista: Compra -------------------------------------------------
+
   function totalItemCount(list) {
     var n = 0;
     list.forEach(function (b) { n += b.items.length; });
     return n;
   }
 
-  function renderMenu(container, menu) {
-    var days = [];
-    menu.forEach(function (m) {
-      var d = days.find(function (x) { return x.day === m.day; });
-      if (!d) { d = { day: m.day, slots: [] }; days.push(d); }
-      d.slots.push(m);
+  function checkedCountFor(block) {
+    var n = 0;
+    block.items.forEach(function (item) {
+      if (savedChecks[block.cat + ":" + item.name]) n++;
     });
-    var wrap = document.createElement("div");
-    wrap.className = "viewer-menu";
-    days.forEach(function (d) {
-      var row = document.createElement("div");
-      row.className = "menu-row";
-      var dayEl = document.createElement("div");
-      dayEl.className = "menu-day mono";
-      dayEl.textContent = d.day.slice(0, 3);
-      var slotsEl = document.createElement("div");
-      slotsEl.className = "menu-slots";
-      d.slots.forEach(function (s) {
-        var slotEl = document.createElement("div");
-        slotEl.className = "menu-slot";
-        slotEl.innerHTML = '<span class="tag">' + (s.slot === "comida" ? "comida" : "cena") + '</span><span>' + s.recipe + '</span>';
-        slotsEl.appendChild(slotEl);
-      });
-      row.appendChild(dayEl);
-      row.appendChild(slotsEl);
-      wrap.appendChild(row);
-    });
-    container.appendChild(wrap);
+    return n;
   }
 
-  function renderList(container, list, storageKey) {
-    var saved = {};
-    try { saved = JSON.parse(localStorage.getItem(storageKey) || "{}"); } catch (e) { saved = {}; }
-
-    var progress = document.createElement("div");
+  function updateOverallProgress(list) {
     var total = totalItemCount(list);
-    container.appendChild(progress);
+    var checked = 0;
+    list.forEach(function (block) { checked += checkedCountFor(block); });
+    document.getElementById("progress-text").textContent = checked + " / " + total + " marcados";
+    document.getElementById("progress-fill").style.width = (total ? (checked / total * 100) : 0) + "%";
+  }
 
-    function updateProgress() {
-      var checked = Object.keys(saved).filter(function (k) { return saved[k]; }).length;
-      progress.className = "progress";
-      progress.textContent = checked + " / " + total + " marcados";
-    }
+  function renderAccordion(list) {
+    var container = document.getElementById("accordion");
+    container.innerHTML = "";
 
     list.forEach(function (block) {
-      var catEl = document.createElement("div");
-      catEl.className = "cat-block";
-      var label = document.createElement("div");
-      label.className = "cat-label";
-      label.textContent = block.cat_label;
-      catEl.appendChild(label);
+      var card = document.createElement("div");
+      card.className = "cat-card";
+
+      var header = document.createElement("button");
+      header.type = "button";
+      header.className = "cat-header";
+      header.setAttribute("aria-expanded", "false");
+
+      var dot = document.createElement("span");
+      dot.className = "cat-dot";
+      dot.style.background = CAT_COLORS[block.cat] || CAT_COLORS.otros;
+
+      var name = document.createElement("span");
+      name.className = "cat-name";
+      name.textContent = block.cat_label;
+
+      var count = document.createElement("span");
+      count.className = "cat-count mono";
+
+      var chevron = document.createElement("span");
+      chevron.className = "chevron";
+
+      header.appendChild(dot);
+      header.appendChild(name);
+      header.appendChild(count);
+      header.appendChild(chevron);
+
+      var panel = document.createElement("div");
+      panel.className = "cat-panel";
+      var panelInner = document.createElement("div");
+      panelInner.className = "cat-panel-inner";
+      var items = document.createElement("div");
+      items.className = "cat-items";
+      panelInner.appendChild(items);
+      panel.appendChild(panelInner);
+
+      function refreshCount() {
+        count.textContent = checkedCountFor(block) + "/" + block.items.length;
+      }
+      refreshCount();
 
       block.items.forEach(function (item) {
         var id = block.cat + ":" + item.name;
@@ -382,11 +498,12 @@
 
         var input = document.createElement("input");
         input.type = "checkbox";
-        input.checked = !!saved[id];
+        input.checked = !!savedChecks[id];
         input.addEventListener("change", function () {
-          saved[id] = input.checked;
-          try { localStorage.setItem(storageKey, JSON.stringify(saved)); } catch (e) {}
-          updateProgress();
+          savedChecks[id] = input.checked;
+          persistSaved();
+          refreshCount();
+          updateOverallProgress(list);
         });
 
         var box = document.createElement("span");
@@ -400,14 +517,72 @@
         row.appendChild(input);
         row.appendChild(box);
         row.appendChild(text);
-        catEl.appendChild(row);
+        items.appendChild(row);
       });
 
-      container.appendChild(catEl);
+      header.addEventListener("click", function () {
+        var open = panel.classList.toggle("open");
+        header.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+
+      card.appendChild(header);
+      card.appendChild(panel);
+      container.appendChild(card);
     });
 
-    updateProgress();
+    updateOverallProgress(list);
   }
+
+  // --- Vista: Menú -----------------------------------------------------
+
+  function renderMenu(menu) {
+    var container = document.getElementById("menu-list");
+    container.innerHTML = "";
+
+    var days = [];
+    menu.forEach(function (m) {
+      var d = days.find(function (x) { return x.day === m.day; });
+      if (!d) { d = { day: m.day, slots: [] }; days.push(d); }
+      d.slots.push(m);
+    });
+
+    days.forEach(function (d) {
+      var card = document.createElement("div");
+      card.className = "day-card";
+      var name = document.createElement("div");
+      name.className = "day-name";
+      name.textContent = d.day;
+      card.appendChild(name);
+      d.slots.forEach(function (s) {
+        var row = document.createElement("div");
+        row.className = "day-slot";
+        row.innerHTML = '<span class="tag">' + (s.slot === "comida" ? "Comida" : "Cena") + '</span><span>' + s.recipe + '</span>';
+        card.appendChild(row);
+      });
+      container.appendChild(card);
+    });
+  }
+
+  // --- Segmented control -----------------------------------------------
+
+  function initSegmented() {
+    var buttons = Array.prototype.slice.call(document.querySelectorAll(".seg-btn"));
+    var highlight = document.getElementById("seg-highlight");
+    var panels = { compra: document.getElementById("view-compra"), menu: document.getElementById("view-menu") };
+
+    buttons.forEach(function (btn, idx) {
+      btn.addEventListener("click", function () {
+        buttons.forEach(function (b) { b.setAttribute("aria-selected", "false"); });
+        btn.setAttribute("aria-selected", "true");
+        highlight.classList.toggle("pos-1", idx === 1);
+        Object.keys(panels).forEach(function (key) {
+          panels[key].hidden = key !== btn.dataset.view;
+        });
+      });
+    });
+  }
+
+  // --- Estados generales -------------------------------------------------
 
   function formatFecha(iso) {
     try {
@@ -422,37 +597,21 @@
   }
 
   function showState(id) {
-    ["state-loading", "state-empty", "state-error", "state-content"].forEach(function (s) {
+    ["state-loading", "state-empty", "state-error", "content"].forEach(function (s) {
       document.getElementById(s).hidden = s !== id;
     });
   }
 
   function showContent(payload) {
+    storageKey = "compra_" + (payload.generated_at || "sin-fecha");
+    savedChecks = loadSaved(storageKey);
+
     document.getElementById("lede").innerHTML =
-      "Generada el <strong>" + formatFecha(payload.generated_at) + "</strong>. Se actualiza sola cada vez " +
-      "que generes la lista desde el escritorio.";
+      "Generada el <strong>" + formatFecha(payload.generated_at) + "</strong>.";
 
-    var ticket = document.getElementById("ticket");
-    ticket.innerHTML = "";
-
-    if (payload.menu && payload.menu.length) {
-      var menuHead = document.createElement("div");
-      menuHead.className = "ticket-head";
-      menuHead.innerHTML = '<span class="ticket-title mono">Menú semanal</span>';
-      ticket.appendChild(menuHead);
-      renderMenu(ticket, payload.menu);
-      var divider = document.createElement("div");
-      divider.className = "tear-divider";
-      ticket.appendChild(divider);
-    }
-
-    var listHead = document.createElement("div");
-    listHead.className = "ticket-head";
-    listHead.innerHTML = '<span class="ticket-title mono">Lista de la compra</span>';
-    ticket.appendChild(listHead);
-    renderList(ticket, payload.list, "compra_" + (payload.generated_at || "sin-fecha"));
-
-    showState("state-content");
+    renderAccordion(payload.list || []);
+    renderMenu(payload.menu || []);
+    showState("content");
   }
 
   function load() {
@@ -477,6 +636,7 @@
       });
   }
 
+  initSegmented();
   document.getElementById("btn-refresh").addEventListener("click", load);
   load();
 })();
