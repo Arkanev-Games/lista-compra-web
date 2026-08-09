@@ -14,10 +14,10 @@
   "use strict";
 
   /* Color de acento por categoría (el punto junto al nombre en el
-     acordeón). Se mantienen dentro de la misma familia de azules que
-     el resto de la web (index a cian), variando tono y luz lo justo
-     para distinguir una categoría de otra sin salirse de la paleta.
-     Las claves son las mismas que CategoriaIngrediente en
+     acordeón de la compra). Se mantienen dentro de la misma familia de
+     azules que el resto de la web (índigo a cian), variando tono y luz
+     lo justo para distinguir una categoría de otra sin salirse de la
+     paleta. Las claves son las mismas que CategoriaIngrediente en
      core/models.py — si allí se añade una categoría nueva, aquí caería
      en el gris-azulado de "otros" hasta que se le asigne un color. */
   var CAT_COLORS = {
@@ -33,20 +33,68 @@
     otros: "#5b6478"
   };
 
-  /* Qué ingredientes están marcados, y bajo qué clave de localStorage
-     se guardan. storageKey se recalcula en cada carga a partir de
-     "generated_at": así, en cuanto generas una lista nueva desde el
-     escritorio, todas las casillas empiezan destapadas otra vez en vez
-     de arrastrar lo marcado la semana anterior. */
-  var savedChecks = {};
-  var storageKey = "compra_sin-fecha";
+  // ============================================================
+  // Marcado persistente (localStorage)
+  // ------------------------------------------------------------
+  // La compra y el menú necesitan lo mismo: recordar qué ids están
+  // marcados, bajo una clave que cambia con "generated_at" — así, en
+  // cuanto generas una lista nueva desde el escritorio, todo empieza
+  // destapado otra vez en vez de arrastrar lo marcado la semana
+  // anterior. Se construye una fábrica en vez de duplicar esta lógica
+  // una vez para la compra y otra para el menú.
+  // ============================================================
 
-  function loadSaved(key) {
-    try { return JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) { return {}; }
+  function crearAlmacenMarcado(prefijo) {
+    var datos = {};
+    var key = prefijo + "_sin-fecha";
+    return {
+      cargar: function (generatedAt) {
+        key = prefijo + "_" + (generatedAt || "sin-fecha");
+        try { datos = JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) { datos = {}; }
+      },
+      estaMarcado: function (id) { return !!datos[id]; },
+      marcar: function (id, valor) {
+        datos[id] = valor;
+        try { localStorage.setItem(key, JSON.stringify(datos)); } catch (e) {}
+      }
+    };
   }
 
-  function persistSaved() {
-    try { localStorage.setItem(storageKey, JSON.stringify(savedChecks)); } catch (e) {}
+  var comprasMarcadas = crearAlmacenMarcado("compra");
+  var menuMarcado = crearAlmacenMarcado("menu");
+
+  /* Actualiza una barra de progreso genérica (se usa tanto para "X/Y
+     marcados" en Compra como para "X/Y hechas" en Menú). */
+  function actualizarProgreso(textId, fillId, marcados, total, etiqueta) {
+    document.getElementById(textId).textContent = marcados + " / " + total + " " + etiqueta;
+    document.getElementById(fillId).style.width = (total ? (marcados / total * 100) : 0) + "%";
+  }
+
+  /* Fila con casilla reutilizada por la lista de la compra y el menú:
+     un <label> con un checkbox real (oculto visualmente, ver
+     .item-row input en style.css), la caja pintada a mano y el texto.
+     Marcar la casilla tacha el nombre mediante CSS (:checked ~ .item-text). */
+  function crearFilaMarcable(id, marcadoInicial, htmlTexto, onCambio) {
+    var row = document.createElement("label");
+    row.className = "item-row";
+
+    var input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = marcadoInicial;
+    input.addEventListener("change", function () { onCambio(input.checked); });
+
+    var box = document.createElement("span");
+    box.className = "check-box";
+    box.setAttribute("aria-hidden", "true");
+
+    var text = document.createElement("span");
+    text.className = "item-text";
+    text.innerHTML = htmlTexto;
+
+    row.appendChild(input);
+    row.appendChild(box);
+    row.appendChild(text);
+    return row;
   }
 
   // ============================================================
@@ -60,22 +108,19 @@
   }
 
   /* Cuántos ingredientes de una categoría concreta están marcados.
-     El id de cada casilla es "categoria:nombre", así que basta con
-     mirar savedChecks con esa clave por cada item del bloque. */
+     El id de cada casilla es "categoria:nombre". */
   function checkedCountFor(block) {
     var n = 0;
     block.items.forEach(function (item) {
-      if (savedChecks[block.cat + ":" + item.name]) n++;
+      if (comprasMarcadas.estaMarcado(block.cat + ":" + item.name)) n++;
     });
     return n;
   }
 
   function updateOverallProgress(list) {
-    var total = totalItemCount(list);
     var checked = 0;
     list.forEach(function (block) { checked += checkedCountFor(block); });
-    document.getElementById("progress-text").textContent = checked + " / " + total + " marcados";
-    document.getElementById("progress-fill").style.width = (total ? (checked / total * 100) : 0) + "%";
+    actualizarProgreso("progress-text", "progress-fill", checked, totalItemCount(list), "marcados");
   }
 
   /* Construye el acordeón de categorías a partir de payload.list.
@@ -132,32 +177,14 @@
 
       block.items.forEach(function (item) {
         var id = block.cat + ":" + item.name;
-        var row = document.createElement("label");
-        row.className = "item-row";
-
-        var input = document.createElement("input");
-        input.type = "checkbox";
-        input.checked = !!savedChecks[id];
-        input.addEventListener("change", function () {
-          savedChecks[id] = input.checked;
-          persistSaved();
+        // item.recipes: qué recetas de la semana necesitan este
+        // ingrediente (útil si dos platos piden lo mismo).
+        var texto = '<div class="item-name">' + item.name + '</div><div class="item-who">' + item.recipes.join(", ") + '</div>';
+        var row = crearFilaMarcable(id, comprasMarcadas.estaMarcado(id), texto, function (marcado) {
+          comprasMarcadas.marcar(id, marcado);
           refreshCount();
           updateOverallProgress(list);
         });
-
-        var box = document.createElement("span");
-        box.className = "check-box";
-        box.setAttribute("aria-hidden", "true");
-
-        var text = document.createElement("span");
-        text.className = "item-text";
-        // item.recipes: qué recetas de la semana necesitan este
-        // ingrediente (útil si dos platos piden lo mismo).
-        text.innerHTML = '<div class="item-name">' + item.name + '</div><div class="item-who">' + item.recipes.join(", ") + '</div>';
-
-        row.appendChild(input);
-        row.appendChild(box);
-        row.appendChild(text);
         items.appendChild(row);
       });
 
@@ -176,6 +203,11 @@
 
   // ============================================================
   // Vista: Menú
+  // ------------------------------------------------------------
+  // El plan semanal no siempre se cumple al pie de la letra, así que
+  // cada comida/cena se puede tachar según se va cocinando: así de un
+  // vistazo se ve qué recetas del menú siguen "disponibles" (sin
+  // tachar) en vez de tener que recordarlo.
   // ============================================================
 
   /* payload.menu llega como una lista plana de {day, slot, recipe};
@@ -200,14 +232,27 @@
       name.className = "day-name";
       name.textContent = d.day;
       card.appendChild(name);
+
       d.slots.forEach(function (s) {
-        var row = document.createElement("div");
-        row.className = "day-slot";
-        row.innerHTML = '<span class="tag">' + (s.slot === "comida" ? "Comida" : "Cena") + '</span><span>' + s.recipe + '</span>';
+        var id = s.day + ":" + s.slot;
+        var etiquetaFranja = s.slot === "comida" ? "Comida" : "Cena";
+        var texto = '<div class="item-name">' + s.recipe + '</div><div class="item-who">' + etiquetaFranja + '</div>';
+        var row = crearFilaMarcable(id, menuMarcado.estaMarcado(id), texto, function (marcado) {
+          menuMarcado.marcar(id, marcado);
+          updateMenuProgress(menu);
+        });
         card.appendChild(row);
       });
+
       container.appendChild(card);
     });
+
+    updateMenuProgress(menu);
+  }
+
+  function updateMenuProgress(menu) {
+    var hechas = menu.filter(function (s) { return menuMarcado.estaMarcado(s.day + ":" + s.slot); }).length;
+    actualizarProgreso("menu-progress-text", "menu-progress-fill", hechas, menu.length, "hechas");
   }
 
   // ============================================================
@@ -271,8 +316,8 @@
   }
 
   function showContent(payload) {
-    storageKey = "compra_" + (payload.generated_at || "sin-fecha");
-    savedChecks = loadSaved(storageKey);
+    comprasMarcadas.cargar(payload.generated_at);
+    menuMarcado.cargar(payload.generated_at);
 
     document.getElementById("lede").innerHTML =
       "Generada el <strong>" + formatFecha(payload.generated_at) + "</strong>.";

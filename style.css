@@ -365,20 +365,10 @@ body {
   margin-bottom: 8px;
 }
 
-.day-slot {
-  display: flex;
-  gap: 10px;
-  padding: 4px 0;
-  font-size: 14.5px;
-}
-
-.day-slot .tag {
-  width: 58px;
-  flex: none;
-  color: var(--muted);
-  font-size: 12px;
-  padding-top: 2px;
-}
+/* Las franjas (Comida/Cena) dentro de cada tarjeta de día reutilizan
+   el componente .item-row / .check-box (definido más arriba, junto a
+   la lista de la compra): tocar una fila la tacha igual que marcar un
+   ingrediente comprado. */
 
 /* ============================================================
    Animación de entrada y accesibilidad de movimiento
