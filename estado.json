@@ -7,6 +7,8 @@
     "verduras:zanahoria": true
   },
   "menu": {
-    "Martes:comida": true
+    "Martes:comida": true,
+    "Sábado:comida": true,
+    "Viernes:comida": true
   }
 }
