@@ -1,14 +1,7 @@
 {
-  "generated_at": "2026-08-09T19:38:22",
-  "compra": {
-    "verduras:guisantes": true,
-    "verduras:cebolla": true,
-    "verduras:patata": true,
-    "verduras:zanahoria": true
-  },
+  "generated_at": "2026-08-09T22:27:34",
+  "compra": {},
   "menu": {
-    "Martes:comida": true,
-    "Sábado:comida": true,
-    "Viernes:comida": true
+    "Martes:cena": true
   }
 }
