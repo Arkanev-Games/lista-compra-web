@@ -71,7 +71,7 @@
     margin: 0 auto;
   }
 
-  .modebar {
+  .topbar {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -155,12 +155,6 @@
     color: var(--muted);
   }
 
-  .ticket-week {
-    font-size: 12px;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-  }
-
   .tear-divider {
     border-top: 1px dashed var(--line);
     margin: 18px 0;
@@ -205,127 +199,7 @@
     font-weight: 600;
   }
 
-  .plain-item {
-    font-size: 13.5px;
-    padding: 3px 0;
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .plain-item .who {
-    color: var(--muted);
-    font-size: 11.5px;
-    text-align: right;
-    flex: none;
-    max-width: 55%;
-  }
-
-  .action-row { margin: 22px 0; }
-
-  button.primary, a.primary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    background: var(--accent);
-    color: var(--accent-ink);
-    border: none;
-    border-radius: 4px;
-    padding: 13px 18px;
-    font-size: 14.5px;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    font-family: inherit;
-  }
-
-  button.primary:hover, a.primary:hover { filter: brightness(1.06); }
-
-  button.secondary {
-    width: 100%;
-    background: transparent;
-    color: var(--ink);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 11px 18px;
-    font-size: 13.5px;
-    cursor: pointer;
-    font-family: inherit;
-  }
-
   :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-
-  .gauge-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11.5px;
-    color: var(--muted);
-    margin-bottom: 6px;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .gauge-track {
-    height: 6px;
-    border-radius: 3px;
-    background: var(--line);
-    overflow: hidden;
-    margin-bottom: 18px;
-  }
-
-  .gauge-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 3px;
-    transition: width 0.4s ease;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .gauge-fill { transition: none; }
-  }
-
-  .url-box {
-    display: block;
-    width: 100%;
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 10px 12px;
-    font-size: 11.5px;
-    word-break: break-all;
-    color: var(--muted);
-    margin-bottom: 14px;
-    max-height: 90px;
-    overflow-y: auto;
-  }
-
-  .result-actions { display: flex; flex-direction: column; gap: 8px; }
-
-  .hint {
-    font-size: 12.5px;
-    color: var(--muted);
-    line-height: 1.6;
-    margin: -6px 0 22px;
-  }
-
-  details.howitworks {
-    border-top: 1px solid var(--line);
-    padding-top: 16px;
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  details.howitworks summary {
-    cursor: pointer;
-    color: var(--ink);
-    font-weight: 600;
-    font-size: 13.5px;
-    margin-bottom: 4px;
-  }
-
-  details.howitworks ol { margin: 10px 0 0; padding-left: 20px; }
-  details.howitworks li { margin-bottom: 8px; line-height: 1.55; }
 
   .progress {
     font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Consolas, monospace;
@@ -401,271 +275,55 @@
     gap: 8px;
   }
 
-  .error-box {
-    border: 1px solid var(--warm);
+  .state-box {
+    border: 1px solid var(--line);
     border-radius: 4px;
-    padding: 14px;
+    padding: 20px;
     font-size: 13.5px;
-    color: var(--warm);
-    margin-bottom: 16px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .state-box.error { border-color: var(--warm); color: var(--warm); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
   }
 </style>
 </head>
 <body>
 <div class="page">
-  <div class="modebar">
-    <span class="eyebrow">Prototipo — enlace autocontenido</span>
-    <button id="btn-reset" class="linklike" hidden type="button">Ver la simulación de escritorio</button>
+  <div class="topbar">
+    <span class="eyebrow">Lista de la compra</span>
+    <button id="btn-refresh" class="linklike" type="button">Actualizar</button>
   </div>
 
-  <section id="view-generator">
-    <h1>Así quedaría la lista sin pasar por Keep</h1>
-    <p class="lede">
-      Esto es lo que generaría el botón <strong>«Generar lista de la compra»</strong> del escritorio:
-      el menú y la lista se comprimen y se meten en la propia URL. No hay servidor ni base de datos —
-      la página que decodifica esos datos es esta misma que estás viendo ahora.
-    </p>
+  <div id="state-loading" class="state-box">Cargando la lista…</div>
 
-    <div class="ticket">
-      <div class="ticket-head">
-        <span class="ticket-title mono">Menú semanal</span>
-        <span class="ticket-week">10–16 ago</span>
-      </div>
-      <div id="ticket-menu"></div>
-      <div class="tear-divider"></div>
-      <div class="ticket-head">
-        <span class="ticket-title mono">Lista de la compra</span>
-      </div>
-      <div id="ticket-list"></div>
-    </div>
+  <div id="state-empty" class="state-box" hidden>
+    Todavía no se ha generado ninguna lista desde el escritorio. En cuanto pulses
+    «Generar lista de la compra» en la app, aparecerá aquí sola.
+  </div>
 
-    <div class="action-row">
-      <button id="btn-generate" class="primary" type="button">Generar enlace →</button>
-    </div>
+  <div id="state-error" class="state-box error" hidden></div>
 
-    <div id="result" hidden>
-      <div class="ticket">
-        <div class="gauge-label">
-          <span id="gauge-text" class="mono">0 / 2953 caracteres</span>
-          <span id="gauge-pct" class="mono">0%</span>
-        </div>
-        <div class="gauge-track"><div id="gauge-fill" class="gauge-fill" style="width:0%"></div></div>
-        <code id="url-text" class="url-box mono"></code>
-        <div class="result-actions">
-          <a id="btn-open" class="primary" href="#">Abrir como si fuera el móvil →</a>
-          <button id="btn-copy" class="secondary" type="button">Copiar enlace</button>
-        </div>
-      </div>
-      <p class="hint">
-        Copia este enlace y pégalo en el navegador de tu móvil (Chrome o Safari) para comprobar que
-        abre exactamente la misma lista, marcable con casillas. En la app real este paso lo haría un
-        código QR generado con la librería <code class="mono">qrcode</code> de Python en una línea —
-        lo que hace falta demostrar es que el contenido del enlace, no el QR en sí, funciona.
-      </p>
-    </div>
-
-    <details class="howitworks">
-      <summary>Cómo funciona por dentro</summary>
-      <ol>
-        <li>El menú y la lista se pasan a JSON y se comprimen con gzip nativo del navegador (<code class="mono">CompressionStream</code>), el mismo formato que produce el módulo <code class="mono">gzip</code> de Python.</li>
-        <li>El resultado se codifica en base64 "seguro para URL" y se coloca tras el <code class="mono">#</code> del enlace — esa parte nunca se envía a ningún servidor, se queda en el propio navegador.</li>
-        <li>Al abrir el enlace, esta misma página lee lo que hay tras el <code class="mono">#</code>, lo descomprime y pinta la lista con casillas. Lo marcado se guarda en el móvil con <code class="mono">localStorage</code>.</li>
-      </ol>
-    </details>
-  </section>
-
-  <section id="view-viewer" hidden>
-    <h1>Lista de la compra</h1>
-    <p class="lede" id="viewer-lede"></p>
-    <div id="viewer-error" hidden></div>
-    <div id="viewer-body"></div>
-  </section>
+  <div id="state-content" hidden>
+    <p class="lede" id="lede"></p>
+    <div class="ticket" id="ticket"></div>
+  </div>
 </div>
 
 <script>
 (function () {
   "use strict";
 
-  var CATS = [
-    { key: "verduras", label: "Verduras y hortalizas" },
-    { key: "frutas", label: "Frutas" },
-    { key: "carne", label: "Carne" },
-    { key: "pescado", label: "Pescado y marisco" },
-    { key: "lacteos_huevos", label: "Lácteos y huevos" },
-    { key: "pan_cereales", label: "Panadería y cereales" },
-    { key: "legumbres_conservas", label: "Legumbres y conservas" },
-    { key: "congelados", label: "Congelados" },
-    { key: "aceites_condimentos", label: "Aceites, salsas y condimentos" },
-    { key: "otros", label: "Otros" }
-  ];
-
-  var SAMPLE = {
-    week: "10–16 de agosto",
-    menu: [
-      { day: "Lunes", slot: "comida", recipe: "Lentejas con chorizo" },
-      { day: "Lunes", slot: "cena", recipe: "Tortilla de patatas" },
-      { day: "Martes", slot: "comida", recipe: "Arroz con pollo" },
-      { day: "Martes", slot: "cena", recipe: "Ensalada de atún y huevo" },
-      { day: "Miércoles", slot: "comida", recipe: "Pasta con tomate y albahaca" },
-      { day: "Miércoles", slot: "cena", recipe: "Crema de calabacín" },
-      { day: "Jueves", slot: "comida", recipe: "Merluza al horno con patatas" },
-      { day: "Jueves", slot: "cena", recipe: "Revuelto de champiñones" },
-      { day: "Viernes", slot: "comida", recipe: "Garbanzos con espinacas" },
-      { day: "Viernes", slot: "cena", recipe: "Pizza casera" },
-      { day: "Sábado", slot: "comida", recipe: "Paella de verduras" },
-      { day: "Sábado", slot: "cena", recipe: "Hamburguesas caseras" },
-      { day: "Domingo", slot: "comida", recipe: "Cocido madrileño" },
-      { day: "Domingo", slot: "cena", recipe: "Sopa de fideos" }
-    ],
-    list: [
-      { cat: "verduras", items: [
-        { name: "Ajo", recipes: ["Lentejas con chorizo", "Arroz con pollo", "Pasta con tomate y albahaca", "Merluza al horno con patatas", "Revuelto de champiñones", "Garbanzos con espinacas", "Paella de verduras", "Sopa de fideos"] },
-        { name: "Calabacín", recipes: ["Crema de calabacín", "Paella de verduras"] },
-        { name: "Cebolla", recipes: ["Lentejas con chorizo", "Tortilla de patatas", "Arroz con pollo", "Ensalada de atún y huevo", "Crema de calabacín", "Hamburguesas caseras", "Sopa de fideos"] },
-        { name: "Champiñones", recipes: ["Revuelto de champiñones", "Pizza casera"] },
-        { name: "Espinacas", recipes: ["Garbanzos con espinacas"] },
-        { name: "Judía verde", recipes: ["Paella de verduras"] },
-        { name: "Lechuga", recipes: ["Ensalada de atún y huevo", "Hamburguesas caseras"] },
-        { name: "Patata", recipes: ["Tortilla de patatas", "Crema de calabacín", "Merluza al horno con patatas", "Cocido madrileño"] },
-        { name: "Pimiento rojo", recipes: ["Arroz con pollo", "Pizza casera", "Paella de verduras"] },
-        { name: "Repollo", recipes: ["Cocido madrileño"] },
-        { name: "Tomate", recipes: ["Ensalada de atún y huevo", "Paella de verduras", "Hamburguesas caseras"] },
-        { name: "Zanahoria", recipes: ["Lentejas con chorizo", "Cocido madrileño", "Sopa de fideos"] }
-      ]},
-      { cat: "frutas", items: [
-        { name: "Limón", recipes: ["Merluza al horno con patatas"] }
-      ]},
-      { cat: "carne", items: [
-        { name: "Carne de ternera", recipes: ["Cocido madrileño"] },
-        { name: "Carne picada", recipes: ["Hamburguesas caseras"] },
-        { name: "Chorizo", recipes: ["Lentejas con chorizo"] },
-        { name: "Pollo", recipes: ["Arroz con pollo", "Cocido madrileño", "Sopa de fideos"] }
-      ]},
-      { cat: "pescado", items: [
-        { name: "Atún en lata", recipes: ["Ensalada de atún y huevo"] },
-        { name: "Merluza", recipes: ["Merluza al horno con patatas"] }
-      ]},
-      { cat: "lacteos_huevos", items: [
-        { name: "Huevos", recipes: ["Tortilla de patatas", "Ensalada de atún y huevo", "Revuelto de champiñones"] },
-        { name: "Nata", recipes: ["Crema de calabacín"] },
-        { name: "Queso rallado", recipes: ["Pasta con tomate y albahaca", "Pizza casera", "Hamburguesas caseras"] }
-      ]},
-      { cat: "pan_cereales", items: [
-        { name: "Arroz", recipes: ["Arroz con pollo", "Paella de verduras"] },
-        { name: "Fideos", recipes: ["Sopa de fideos"] },
-        { name: "Pan de hamburguesa", recipes: ["Hamburguesas caseras"] },
-        { name: "Pan de pizza (masa)", recipes: ["Pizza casera"] },
-        { name: "Pasta", recipes: ["Pasta con tomate y albahaca"] }
-      ]},
-      { cat: "legumbres_conservas", items: [
-        { name: "Garbanzos", recipes: ["Garbanzos con espinacas", "Cocido madrileño"] },
-        { name: "Lentejas", recipes: ["Lentejas con chorizo"] }
-      ]},
-      { cat: "congelados", items: [
-        { name: "Guisantes congelados", recipes: ["Paella de verduras"] }
-      ]},
-      { cat: "aceites_condimentos", items: [
-        { name: "Aceite de oliva", recipes: ["Lentejas con chorizo", "Tortilla de patatas", "Arroz con pollo", "Ensalada de atún y huevo", "Pasta con tomate y albahaca", "Crema de calabacín", "Merluza al horno con patatas", "Revuelto de champiñones", "Garbanzos con espinacas", "Paella de verduras"] },
-        { name: "Albahaca", recipes: ["Pasta con tomate y albahaca"] },
-        { name: "Pimentón", recipes: ["Garbanzos con espinacas"] },
-        { name: "Sal", recipes: ["Lentejas con chorizo", "Tortilla de patatas", "Crema de calabacín", "Merluza al horno con patatas", "Revuelto de champiñones", "Garbanzos con espinacas"] },
-        { name: "Tomate frito", recipes: ["Arroz con pollo", "Pasta con tomate y albahaca", "Pizza casera"] }
-      ]}
-    ]
-  };
-
-  var QR_BUDGET = 2953;
-
-  function catLabel(key) {
-    for (var i = 0; i < CATS.length; i++) if (CATS[i].key === key) return CATS[i].label;
-    return key;
+  function totalItemCount(list) {
+    var n = 0;
+    list.forEach(function (b) { n += b.items.length; });
+    return n;
   }
 
-  function bytesToBase64Url(bytes) {
-    var binary = "";
-    for (var i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  }
-
-  function base64UrlToBytes(b64url) {
-    var b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
-    while (b64.length % 4) b64 += "=";
-    var binary = atob(b64);
-    var bytes = new Uint8Array(binary.length);
-    for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    return bytes;
-  }
-
-  function supportsStreams() {
-    return typeof window.CompressionStream === "function" && typeof window.DecompressionStream === "function";
-  }
-
-  function gzipEncode(obj) {
-    var json = JSON.stringify(obj);
-    var bytes = new TextEncoder().encode(json);
-    var stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream("gzip"));
-    return new Response(stream).arrayBuffer().then(function (buf) {
-      return bytesToBase64Url(new Uint8Array(buf));
-    });
-  }
-
-  function gzipDecode(b64url) {
-    var bytes = base64UrlToBytes(b64url);
-    var stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
-    return new Response(stream).arrayBuffer().then(function (buf) {
-      var json = new TextDecoder().decode(new Uint8Array(buf));
-      return JSON.parse(json);
-    });
-  }
-
-  function renderTicketMenu(container, menu) {
-    var days = [];
-    menu.forEach(function (m) {
-      var d = days.find(function (x) { return x.day === m.day; });
-      if (!d) { d = { day: m.day, slots: [] }; days.push(d); }
-      d.slots.push(m);
-    });
-    container.innerHTML = "";
-    days.forEach(function (d) {
-      var row = document.createElement("div");
-      row.className = "menu-row";
-      var dayEl = document.createElement("div");
-      dayEl.className = "menu-day mono";
-      dayEl.textContent = d.day.slice(0, 3);
-      var slotsEl = document.createElement("div");
-      slotsEl.className = "menu-slots";
-      d.slots.forEach(function (s) {
-        var slotEl = document.createElement("div");
-        slotEl.className = "menu-slot";
-        slotEl.innerHTML = '<span class="tag">' + (s.slot === "comida" ? "comida" : "cena") + '</span><span>' + s.recipe + '</span>';
-        slotsEl.appendChild(slotEl);
-      });
-      row.appendChild(dayEl);
-      row.appendChild(slotsEl);
-      container.appendChild(row);
-    });
-  }
-
-  function renderPlainList(container, list) {
-    container.innerHTML = "";
-    list.forEach(function (block) {
-      var catEl = document.createElement("div");
-      catEl.className = "cat-block";
-      var label = document.createElement("div");
-      label.className = "cat-label";
-      label.textContent = catLabel(block.cat);
-      catEl.appendChild(label);
-      block.items.forEach(function (item) {
-        var row = document.createElement("div");
-        row.className = "plain-item";
-        row.innerHTML = '<span>' + item.name + '</span><span class="who">' + item.recipes.join(", ") + '</span>';
-        catEl.appendChild(row);
-      });
-      container.appendChild(catEl);
-    });
-  }
-
-  function renderViewerMenu(container, menu) {
+  function renderMenu(container, menu) {
     var days = [];
     menu.forEach(function (m) {
       var d = days.find(function (x) { return x.day === m.day; });
@@ -695,13 +353,7 @@
     container.appendChild(wrap);
   }
 
-  function totalItemCount(list) {
-    var n = 0;
-    list.forEach(function (b) { n += b.items.length; });
-    return n;
-  }
-
-  function renderViewerList(container, list, storageKey) {
+  function renderList(container, list, storageKey) {
     var saved = {};
     try { saved = JSON.parse(localStorage.getItem(storageKey) || "{}"); } catch (e) { saved = {}; }
 
@@ -720,7 +372,7 @@
       catEl.className = "cat-block";
       var label = document.createElement("div");
       label.className = "cat-label";
-      label.textContent = catLabel(block.cat);
+      label.textContent = block.cat_label;
       catEl.appendChild(label);
 
       block.items.forEach(function (item) {
@@ -757,105 +409,76 @@
     updateProgress();
   }
 
-  function showGenerator() {
-    document.getElementById("view-generator").hidden = false;
-    document.getElementById("view-viewer").hidden = true;
-    document.getElementById("btn-reset").hidden = true;
+  function formatFecha(iso) {
+    try {
+      var d = new Date(iso);
+      var texto = d.toLocaleString("es-ES", {
+        weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit"
+      });
+      return texto.charAt(0).toUpperCase() + texto.slice(1);
+    } catch (e) {
+      return iso;
+    }
   }
 
-  function showViewer(payload, storageKey) {
-    document.getElementById("view-generator").hidden = true;
-    var view = document.getElementById("view-viewer");
-    view.hidden = false;
-    document.getElementById("btn-reset").hidden = false;
+  function showState(id) {
+    ["state-loading", "state-empty", "state-error", "state-content"].forEach(function (s) {
+      document.getElementById(s).hidden = s !== id;
+    });
+  }
 
-    document.getElementById("viewer-lede").innerHTML =
-      "Semana del <strong>" + payload.week + "</strong>. Esta página decodificó el enlace en tu propio navegador — nada pasó por ningún servidor.";
-    document.getElementById("viewer-error").hidden = true;
+  function showContent(payload) {
+    document.getElementById("lede").innerHTML =
+      "Generada el <strong>" + formatFecha(payload.generated_at) + "</strong>. Se actualiza sola cada vez " +
+      "que generes la lista desde el escritorio.";
 
-    var body = document.getElementById("viewer-body");
-    body.innerHTML = "";
-    var ticket = document.createElement("div");
-    ticket.className = "ticket";
-    var head = document.createElement("div");
-    head.className = "ticket-head";
-    head.innerHTML = '<span class="ticket-title mono">Menú semanal</span><span class="ticket-week">' + payload.week + '</span>';
-    ticket.appendChild(head);
-    renderViewerMenu(ticket, payload.menu);
-    var divider = document.createElement("div");
-    divider.className = "tear-divider";
-    ticket.appendChild(divider);
+    var ticket = document.getElementById("ticket");
+    ticket.innerHTML = "";
+
+    if (payload.menu && payload.menu.length) {
+      var menuHead = document.createElement("div");
+      menuHead.className = "ticket-head";
+      menuHead.innerHTML = '<span class="ticket-title mono">Menú semanal</span>';
+      ticket.appendChild(menuHead);
+      renderMenu(ticket, payload.menu);
+      var divider = document.createElement("div");
+      divider.className = "tear-divider";
+      ticket.appendChild(divider);
+    }
+
     var listHead = document.createElement("div");
     listHead.className = "ticket-head";
     listHead.innerHTML = '<span class="ticket-title mono">Lista de la compra</span>';
     ticket.appendChild(listHead);
-    renderViewerList(ticket, payload.list, storageKey);
-    body.appendChild(ticket);
+    renderList(ticket, payload.list, "compra_" + (payload.generated_at || "sin-fecha"));
+
+    showState("state-content");
   }
 
-  function showViewerError(message) {
-    document.getElementById("view-generator").hidden = true;
-    document.getElementById("view-viewer").hidden = false;
-    document.getElementById("btn-reset").hidden = false;
-    document.getElementById("viewer-lede").textContent = "";
-    var err = document.getElementById("viewer-error");
-    err.hidden = false;
-    err.className = "error-box";
-    err.textContent = message;
-    document.getElementById("viewer-body").innerHTML = "";
+  function load() {
+    showState("state-loading");
+    fetch("./lista.json", { cache: "no-store" })
+      .then(function (res) {
+        if (res.status === 404) return null;
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(function (payload) {
+        if (!payload || ((!payload.menu || !payload.menu.length) && (!payload.list || !payload.list.length))) {
+          showState("state-empty");
+          return;
+        }
+        showContent(payload);
+      })
+      .catch(function () {
+        document.getElementById("state-error").textContent =
+          "No se pudo cargar la lista. Comprueba tu conexión e inténtalo de nuevo.";
+        showState("state-error");
+      });
   }
 
-  function route() {
-    var hash = location.hash.replace(/^#/, "");
-    if (!hash) { showGenerator(); return; }
-    if (!supportsStreams()) {
-      showViewerError("Este navegador no soporta descompresión nativa. Prueba con una versión reciente de Chrome o Safari.");
-      return;
-    }
-    gzipDecode(hash).then(function (payload) {
-      showViewer(payload, "compra_" + hash.slice(0, 24));
-    }).catch(function () {
-      showViewerError("El enlace parece incompleto o dañado. Vuelve a generarlo desde la simulación de escritorio.");
-    });
-  }
-
-  renderTicketMenu(document.getElementById("ticket-menu"), SAMPLE.menu);
-  renderPlainList(document.getElementById("ticket-list"), SAMPLE.list);
-
-  document.getElementById("btn-generate").addEventListener("click", function () {
-    if (!supportsStreams()) {
-      alert("Este navegador no soporta compresión nativa (CompressionStream). Prueba con Chrome o Safari recientes.");
-      return;
-    }
-    gzipEncode(SAMPLE).then(function (encoded) {
-      var url = location.origin + location.pathname + "#" + encoded;
-      document.getElementById("url-text").textContent = url;
-      document.getElementById("btn-open").href = "#" + encoded;
-      var pct = Math.min(100, Math.round((encoded.length / QR_BUDGET) * 100));
-      document.getElementById("gauge-text").textContent = encoded.length + " / " + QR_BUDGET + " caracteres";
-      document.getElementById("gauge-pct").textContent = pct + "%";
-      document.getElementById("gauge-fill").style.width = pct + "%";
-      document.getElementById("result").hidden = false;
-    });
-  });
-
-  document.getElementById("btn-copy").addEventListener("click", function () {
-    var url = document.getElementById("url-text").textContent;
-    var btn = document.getElementById("btn-copy");
-    navigator.clipboard.writeText(url).then(function () {
-      var original = btn.textContent;
-      btn.textContent = "Copiado";
-      setTimeout(function () { btn.textContent = original; }, 1500);
-    }).catch(function () {});
-  });
-
-  document.getElementById("btn-reset").addEventListener("click", function () {
-    history.pushState("", document.title, location.pathname + location.search);
-    route();
-  });
-
-  window.addEventListener("hashchange", route);
-  route();
+  document.getElementById("btn-refresh").addEventListener("click", load);
+  load();
 })();
 </script>
 </body>
