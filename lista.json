@@ -1,26 +1,83 @@
 {
-  "generated_at": "2026-08-09T19:00:00",
+  "generated_at": "2026-08-09T19:38:22",
   "menu": [
     {
-      "day": "Lunes",
+      "day": "Martes",
       "slot": "comida",
-      "recipe": "Lentejas con chorizo"
+      "recipe": "Arroz tres delicias"
     },
     {
-      "day": "Lunes",
+      "day": "Martes",
+      "slot": "cena",
+      "recipe": "Ensalada de garbanzos"
+    },
+    {
+      "day": "Viernes",
+      "slot": "comida",
+      "recipe": "Ensalada de garbanzos"
+    },
+    {
+      "day": "Viernes",
       "slot": "cena",
       "recipe": "Tortilla de patatas"
+    },
+    {
+      "day": "Sábado",
+      "slot": "comida",
+      "recipe": "Arroz tres delicias"
     }
   ],
   "list": [
     {
-      "cat": "legumbres_conservas",
-      "cat_label": "Legumbres y conservas",
+      "cat": "verduras",
+      "cat_label": "Verduras y hortalizas",
       "items": [
         {
-          "name": "Lentejas",
+          "name": "cebolla",
           "recipes": [
-            "Lentejas con chorizo"
+            "Tortilla de patatas"
+          ]
+        },
+        {
+          "name": "guisantes",
+          "recipes": [
+            "Arroz tres delicias"
+          ]
+        },
+        {
+          "name": "patata",
+          "recipes": [
+            "Tortilla de patatas"
+          ]
+        },
+        {
+          "name": "pepino",
+          "recipes": [
+            "Ensalada de garbanzos"
+          ]
+        },
+        {
+          "name": "tomate",
+          "recipes": [
+            "Ensalada de garbanzos"
+          ]
+        },
+        {
+          "name": "zanahoria",
+          "recipes": [
+            "Arroz tres delicias"
+          ]
+        }
+      ]
+    },
+    {
+      "cat": "carne",
+      "cat_label": "Carne",
+      "items": [
+        {
+          "name": "jamón cocido",
+          "recipes": [
+            "Arroz tres delicias"
           ]
         }
       ]
@@ -30,7 +87,57 @@
       "cat_label": "Lácteos y huevos",
       "items": [
         {
-          "name": "Huevos",
+          "name": "huevo",
+          "recipes": [
+            "Arroz tres delicias",
+            "Tortilla de patatas"
+          ]
+        }
+      ]
+    },
+    {
+      "cat": "pan_cereales",
+      "cat_label": "Panadería y cereales",
+      "items": [
+        {
+          "name": "arroz",
+          "recipes": [
+            "Arroz tres delicias"
+          ]
+        }
+      ]
+    },
+    {
+      "cat": "legumbres_conservas",
+      "cat_label": "Legumbres y conservas",
+      "items": [
+        {
+          "name": "aceitunas",
+          "recipes": [
+            "Ensalada de garbanzos"
+          ]
+        },
+        {
+          "name": "garbanzos cocidos",
+          "recipes": [
+            "Ensalada de garbanzos"
+          ]
+        }
+      ]
+    },
+    {
+      "cat": "aceites_condimentos",
+      "cat_label": "Aceites, salsas y condimentos",
+      "items": [
+        {
+          "name": "aceite de oliva",
+          "recipes": [
+            "Ensalada de garbanzos",
+            "Tortilla de patatas"
+          ]
+        },
+        {
+          "name": "sal",
           "recipes": [
             "Tortilla de patatas"
           ]
