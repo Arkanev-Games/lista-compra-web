@@ -34,14 +34,172 @@
   };
 
   // ============================================================
-  // Marcado persistente (localStorage)
+  // Sincronización entre dispositivos (opcional)
+  // ------------------------------------------------------------
+  // Sin nada más, lo marcado vive solo en el localStorage de cada
+  // navegador. Si el usuario pega en el panel "Sincronizar" un token
+  // personal de GitHub (con permiso de escritura solo sobre este
+  // repositorio), cada cambio se sube además a estado.json en el
+  // propio repo mediante la API de contenidos de GitHub — y así
+  // cualquier otro dispositivo lo ve con un simple fetch (lectura
+  // pública, sin token) la próxima vez que abra la página.
+  //
+  // El token no se sube nunca a ningún sitio propio: solo se guarda
+  // en el localStorage de ese dispositivo y se usa para hablar
+  // directamente con la API de GitHub desde el propio navegador.
+  // ============================================================
+
+  var REPO_OWNER = "Arkanev-Games";
+  var REPO_NAME = "lista-compra-web";
+  var ESTADO_PATH = "estado.json";
+  var TOKEN_KEY = "gh_token";
+
+  var currentGeneratedAt = null;
+  var subidaPendiente = null;
+
+  function getToken() {
+    try { return localStorage.getItem(TOKEN_KEY) || ""; } catch (e) { return ""; }
+  }
+
+  function setToken(token) {
+    try {
+      if (token) localStorage.setItem(TOKEN_KEY, token);
+      else localStorage.removeItem(TOKEN_KEY);
+    } catch (e) {}
+  }
+
+  function apiUrl(path) {
+    return "https://api.github.com/repos/" + REPO_OWNER + "/" + REPO_NAME + "/contents/" + path;
+  }
+
+  // btoa() solo entiende Latin-1: se pasa primero por TextEncoder para
+  // no romper los acentos del menú/la lista al codificar a base64.
+  function utf8ToBase64(str) {
+    var bytes = new TextEncoder().encode(str);
+    var binary = "";
+    for (var i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    return btoa(binary);
+  }
+
+  function setSyncStatus(estado) {
+    var el = document.getElementById("sync-status");
+    if (!el) return;
+    el.className = "sync-status" + (estado === "ok" ? " ok" : estado === "error" ? " error" : "");
+    el.textContent = {
+      "sin-token": "Sin sincronizar: pega un token para que lo marcado se vea igual en tus otros dispositivos.",
+      "guardado": "Token guardado en este dispositivo.",
+      "subiendo": "Sincronizando…",
+      "ok": "Sincronizado con GitHub.",
+      "error": "No se pudo sincronizar (revisa el token). Se ha guardado solo en este dispositivo."
+    }[estado] || "";
+  }
+
+  /* Sube el estado combinado (compra + menú) a estado.json. Antes lee
+     el archivo actual para conocer su "sha" — la API de GitHub lo
+     exige para saber que no se está pisando un cambio de otro
+     dispositivo a ciegas — y si justo ha cambiado entre medias
+     (409), reintenta una vez con el sha nuevo. */
+  function subirEstado(estadoActual, reintento) {
+    var token = getToken();
+    if (!token) return;
+
+    fetch(apiUrl(ESTADO_PATH), { headers: { Authorization: "Bearer " + token } })
+      .then(function (res) {
+        if (res.status === 404) return null;
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(function (actual) {
+        var body = {
+          message: "Actualiza estado de marcado",
+          content: utf8ToBase64(JSON.stringify(estadoActual, null, 2))
+        };
+        if (actual && actual.sha) body.sha = actual.sha;
+        return fetch(apiUrl(ESTADO_PATH), {
+          method: "PUT",
+          headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+      })
+      .then(function (res) {
+        if (res.status === 409 && !reintento) return subirEstado(estadoActual, true);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        setSyncStatus("ok");
+      })
+      .catch(function () { setSyncStatus("error"); });
+  }
+
+  /* Se llama tras cada cambio en cualquiera de los dos almacenes.
+     Agrupa varios toques seguidos (por ejemplo, marcar media docena
+     de ingredientes de golpe) en una sola subida en vez de una por
+     casilla. */
+  function programarSubida() {
+    if (!getToken() || !currentGeneratedAt) return;
+    clearTimeout(subidaPendiente);
+    setSyncStatus("subiendo");
+    subidaPendiente = setTimeout(function () {
+      subirEstado({
+        generated_at: currentGeneratedAt,
+        compra: comprasMarcadas.exportar(),
+        menu: menuMarcado.exportar()
+      });
+    }, 800);
+  }
+
+  /* Al cargar, además de lo que ya haya en este navegador, se intenta
+     leer estado.json (lectura pública, sin token) y, si pertenece a
+     la misma lista (mismo generated_at), sustituye lo local por lo
+     remoto — así un móvil que no ha tocado nada ve lo que se marcó
+     desde otro dispositivo. Devuelve si hubo algo que aplicar, para
+     que quien la llama sepa si tiene que volver a pintar la pantalla. */
+  function cargarEstadoRemoto(generatedAt) {
+    return fetch("./estado.json", { cache: "no-store" })
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .catch(function () { return null; })
+      .then(function (remoto) {
+        if (!remoto || remoto.generated_at !== generatedAt) return false;
+        comprasMarcadas.reemplazarTodo(remoto.compra || {});
+        menuMarcado.reemplazarTodo(remoto.menu || {});
+        return true;
+      });
+  }
+
+  function initSync() {
+    var panel = document.getElementById("sync-panel");
+    var input = document.getElementById("token-input");
+
+    document.getElementById("btn-sync").addEventListener("click", function () {
+      panel.hidden = !panel.hidden;
+      if (!panel.hidden) setSyncStatus(getToken() ? "guardado" : "sin-token");
+    });
+
+    document.getElementById("btn-sync-save").addEventListener("click", function () {
+      var valor = input.value.trim();
+      if (!valor) return;
+      setToken(valor);
+      input.value = "";
+      // Sube el estado actual ya mismo: así el token se valida al
+      // momento en vez de esperar al próximo cambio.
+      programarSubida();
+    });
+
+    document.getElementById("btn-sync-clear").addEventListener("click", function () {
+      setToken("");
+      input.value = "";
+      setSyncStatus("sin-token");
+    });
+  }
+
+  // ============================================================
+  // Marcado persistente (localStorage + sincronización opcional)
   // ------------------------------------------------------------
   // La compra y el menú necesitan lo mismo: recordar qué ids están
   // marcados, bajo una clave que cambia con "generated_at" — así, en
   // cuanto generas una lista nueva desde el escritorio, todo empieza
   // destapado otra vez en vez de arrastrar lo marcado la semana
   // anterior. Se construye una fábrica en vez de duplicar esta lógica
-  // una vez para la compra y otra para el menú.
+  // una vez para la compra y otra para el menú; cada cambio dispara
+  // además programarSubida() para intentar sincronizarlo.
   // ============================================================
 
   function crearAlmacenMarcado(prefijo) {
@@ -52,10 +210,16 @@
         key = prefijo + "_" + (generatedAt || "sin-fecha");
         try { datos = JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) { datos = {}; }
       },
+      reemplazarTodo: function (nuevo) {
+        datos = nuevo;
+        try { localStorage.setItem(key, JSON.stringify(datos)); } catch (e) {}
+      },
+      exportar: function () { return datos; },
       estaMarcado: function (id) { return !!datos[id]; },
       marcar: function (id, valor) {
         datos[id] = valor;
         try { localStorage.setItem(key, JSON.stringify(datos)); } catch (e) {}
+        programarSubida();
       }
     };
   }
@@ -316,6 +480,7 @@
   }
 
   function showContent(payload) {
+    currentGeneratedAt = payload.generated_at;
     comprasMarcadas.cargar(payload.generated_at);
     menuMarcado.cargar(payload.generated_at);
 
@@ -325,6 +490,15 @@
     renderAccordion(payload.list || []);
     renderMenu(payload.menu || []);
     showState("content");
+
+    // Lo remoto puede traer marcas hechas desde otro dispositivo desde
+    // la última vez que se cargó esta lista aquí: si hay algo nuevo,
+    // se repintan las dos vistas con los datos ya actualizados.
+    cargarEstadoRemoto(payload.generated_at).then(function (huboCambios) {
+      if (!huboCambios) return;
+      renderAccordion(payload.list || []);
+      renderMenu(payload.menu || []);
+    });
   }
 
   function load() {
@@ -350,6 +524,7 @@
   }
 
   initSegmented();
+  initSync();
   document.getElementById("btn-refresh").addEventListener("click", load);
   load();
 })();

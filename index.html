@@ -8,13 +8,34 @@
 <!-- ?v=N evita que el móvil se quede con una copia en caché de una
      versión anterior: sube el número cada vez que cambies style.css
      o app.js, o el navegador podría no notar que hay una nueva. -->
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <div class="page">
   <div class="appbar">
     <span class="brand">Menú de la semana</span>
-    <button id="btn-refresh" class="refresh-btn" type="button">Actualizar</button>
+    <div class="appbar-actions">
+      <button id="btn-sync" class="refresh-btn" type="button">Sincronizar</button>
+      <button id="btn-refresh" class="refresh-btn" type="button">Actualizar</button>
+    </div>
+  </div>
+
+  <!-- Panel de sincronización entre dispositivos: oculto hasta que se
+       pulsa "Sincronizar". Ver la sección de sincronización en app.js. -->
+  <div id="sync-panel" class="state-card sync-panel" hidden>
+    <p>
+      Sin nada más, lo marcado solo se guarda en este navegador. Pega aquí un
+      token personal de GitHub (con permiso de escritura solo sobre el
+      repositorio <code class="mono">lista-compra-web</code>) para que lo que
+      marques se vea igual desde el resto de tus dispositivos.
+    </p>
+    <input id="token-input" class="token-input" type="password" autocomplete="off" spellcheck="false"
+           placeholder="Token de GitHub (github.com/settings/personal-access-tokens/new)">
+    <div class="sync-actions">
+      <button id="btn-sync-save" class="refresh-btn" type="button">Guardar</button>
+      <button id="btn-sync-clear" class="refresh-btn" type="button">Quitar</button>
+    </div>
+    <p id="sync-status" class="sync-status"></p>
   </div>
 
   <!-- Selector de vista: solo dos pestañas, ver .seg-highlight en style.css -->
@@ -60,6 +81,6 @@
   </div>
 </div>
 
-<script src="app.js?v=3"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>

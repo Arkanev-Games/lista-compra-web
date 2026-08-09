@@ -85,11 +85,13 @@ body {
   font-weight: 700;
 }
 
+.appbar-actions { display: flex; gap: 16px; }
+
 .refresh-btn {
   background: none;
   border: none;
   padding: 0;
-  color: var(--accent);
+  color: var(--accent-strong);
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
@@ -172,6 +174,31 @@ body {
 }
 
 .state-card.error { border-color: var(--danger); color: var(--danger); }
+
+/* Panel de sincronización: mismo look que .state-card pero alineado a
+   la izquierda (es un formulario, no un mensaje centrado). */
+.sync-panel { text-align: left; margin-bottom: 16px; }
+.sync-panel p { margin: 0 0 12px; line-height: 1.6; }
+.sync-panel code { color: var(--accent-strong); }
+
+.token-input {
+  display: block;
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 12px;
+  color: var(--ink);
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Consolas, monospace;
+  font-size: 12.5px;
+  margin-bottom: 12px;
+}
+
+.sync-actions { display: flex; gap: 16px; margin-bottom: 10px; }
+
+.sync-status { font-size: 12px; margin: 0; }
+.sync-status.ok { color: var(--accent-strong); }
+.sync-status.error { color: var(--danger); }
 
 /* ============================================================
    Vista Compra: barra de progreso general
