@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-08-09T19:00:00",
+  "menu": [
+    {
+      "day": "Lunes",
+      "slot": "comida",
+      "recipe": "Lentejas con chorizo"
+    },
+    {
+      "day": "Lunes",
+      "slot": "cena",
+      "recipe": "Tortilla de patatas"
+    }
+  ],
+  "list": [
+    {
+      "cat": "legumbres_conservas",
+      "cat_label": "Legumbres y conservas",
+      "items": [
+        {
+          "name": "Lentejas",
+          "recipes": [
+            "Lentejas con chorizo"
+          ]
+        }
+      ]
+    },
+    {
+      "cat": "lacteos_huevos",
+      "cat_label": "Lácteos y huevos",
+      "items": [
+        {
+          "name": "Huevos",
+          "recipes": [
+            "Tortilla de patatas"
+          ]
+        }
+      ]
+    }
+  ]
+}
