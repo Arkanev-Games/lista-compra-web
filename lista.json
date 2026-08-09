@@ -1,30 +1,35 @@
 {
-  "generated_at": "2026-08-09T19:38:22",
+  "generated_at": "2026-08-09T22:27:34",
   "menu": [
     {
-      "day": "Martes",
+      "day": "Lunes",
       "slot": "comida",
       "recipe": "Arroz tres delicias"
     },
     {
+      "day": "Lunes",
+      "slot": "cena",
+      "recipe": "Salmón al horno con verduras"
+    },
+    {
+      "day": "Martes",
+      "slot": "comida",
+      "recipe": "Estofado de ternera con patatas"
+    },
+    {
       "day": "Martes",
       "slot": "cena",
-      "recipe": "Ensalada de garbanzos"
+      "recipe": "Sopa de fideos"
     },
     {
-      "day": "Viernes",
+      "day": "Miércoles",
       "slot": "comida",
       "recipe": "Ensalada de garbanzos"
     },
     {
-      "day": "Viernes",
+      "day": "Miércoles",
       "slot": "cena",
-      "recipe": "Tortilla de patatas"
-    },
-    {
-      "day": "Sábado",
-      "slot": "comida",
-      "recipe": "Arroz tres delicias"
+      "recipe": "Salmón al horno con verduras"
     }
   ],
   "list": [
@@ -33,9 +38,15 @@
       "cat_label": "Verduras y hortalizas",
       "items": [
         {
+          "name": "calabacín",
+          "recipes": [
+            "Salmón al horno con verduras"
+          ]
+        },
+        {
           "name": "cebolla",
           "recipes": [
-            "Tortilla de patatas"
+            "Estofado de ternera con patatas"
           ]
         },
         {
@@ -47,13 +58,19 @@
         {
           "name": "patata",
           "recipes": [
-            "Tortilla de patatas"
+            "Estofado de ternera con patatas"
           ]
         },
         {
           "name": "pepino",
           "recipes": [
             "Ensalada de garbanzos"
+          ]
+        },
+        {
+          "name": "pimiento rojo",
+          "recipes": [
+            "Salmón al horno con verduras"
           ]
         },
         {
@@ -65,7 +82,21 @@
         {
           "name": "zanahoria",
           "recipes": [
-            "Arroz tres delicias"
+            "Arroz tres delicias",
+            "Estofado de ternera con patatas",
+            "Sopa de fideos"
+          ]
+        }
+      ]
+    },
+    {
+      "cat": "frutas",
+      "cat_label": "Frutas",
+      "items": [
+        {
+          "name": "limón",
+          "recipes": [
+            "Salmón al horno con verduras"
           ]
         }
       ]
@@ -79,6 +110,24 @@
           "recipes": [
             "Arroz tres delicias"
           ]
+        },
+        {
+          "name": "ternera para estofar",
+          "recipes": [
+            "Estofado de ternera con patatas"
+          ]
+        }
+      ]
+    },
+    {
+      "cat": "pescado",
+      "cat_label": "Pescado y marisco",
+      "items": [
+        {
+          "name": "lomos de salmón",
+          "recipes": [
+            "Salmón al horno con verduras"
+          ]
         }
       ]
     },
@@ -89,8 +138,7 @@
         {
           "name": "huevo",
           "recipes": [
-            "Arroz tres delicias",
-            "Tortilla de patatas"
+            "Arroz tres delicias"
           ]
         }
       ]
@@ -103,6 +151,12 @@
           "name": "arroz",
           "recipes": [
             "Arroz tres delicias"
+          ]
+        },
+        {
+          "name": "fideos",
+          "recipes": [
+            "Sopa de fideos"
           ]
         }
       ]
@@ -132,14 +186,25 @@
         {
           "name": "aceite de oliva",
           "recipes": [
-            "Ensalada de garbanzos",
-            "Tortilla de patatas"
+            "Ensalada de garbanzos"
           ]
         },
         {
-          "name": "sal",
+          "name": "vino tinto",
           "recipes": [
-            "Tortilla de patatas"
+            "Estofado de ternera con patatas"
+          ]
+        }
+      ]
+    },
+    {
+      "cat": "otros",
+      "cat_label": "Otros",
+      "items": [
+        {
+          "name": "caldo de pollo",
+          "recipes": [
+            "Sopa de fideos"
           ]
         }
       ]
