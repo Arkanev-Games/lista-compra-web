@@ -6,5 +6,7 @@
     "verduras:patata": true,
     "verduras:zanahoria": true
   },
-  "menu": {}
+  "menu": {
+    "Martes:comida": true
+  }
 }
