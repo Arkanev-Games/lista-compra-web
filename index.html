@@ -8,7 +8,7 @@
 <!-- ?v=N evita que el móvil se quede con una copia en caché de una
      versión anterior: sube el número cada vez que cambies style.css
      o app.js, o el navegador podría no notar que hay una nueva. -->
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 <div class="page">
@@ -36,12 +36,21 @@
       <button id="btn-sync-clear" class="refresh-btn" type="button">Quitar</button>
     </div>
     <p id="sync-status" class="sync-status"></p>
+
+    <!-- Solo visible si ya hay un token guardado: un enlace con el
+         token incluido para abrir una vez en cada dispositivo más,
+         sin tener que copiar y pegar el token a mano cada vez. -->
+    <div id="sync-share" hidden>
+      <p class="sync-share-label">Enlace para tus otros dispositivos (ábrelo una vez en cada uno):</p>
+      <code id="sync-share-url" class="share-url mono"></code>
+      <button id="btn-sync-share-copy" class="refresh-btn" type="button">Copiar enlace</button>
+    </div>
   </div>
 
   <!-- Selector de vista: solo dos pestañas, ver .seg-highlight en style.css -->
   <div class="segmented" role="tablist">
-    <button class="seg-btn" data-view="menu" role="tab" aria-selected="false" type="button">Menú</button>
-    <button class="seg-btn" data-view="compra" role="tab" aria-selected="true" type="button">Compra</button>
+    <button class="seg-btn" data-view="menu" role="tab" aria-selected="true" type="button">Menú</button>
+    <button class="seg-btn" data-view="compra" role="tab" aria-selected="false" type="button">Compra</button>
     <div id="seg-highlight" class="seg-highlight" aria-hidden="true"></div>
   </div>
 
@@ -81,6 +90,6 @@
   </div>
 </div>
 
-<script src="app.js?v=4"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>

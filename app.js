@@ -164,13 +164,30 @@
       });
   }
 
+  /* El mismo token vale para varios dispositivos (no hace falta uno
+     por persona), así que en vez de tener que copiarlo y pegarlo a
+     mano en cada móvil, aquí se arma un enlace que ya lo lleva
+     incluido: abrirlo una vez basta para dejar ese dispositivo
+     sincronizado. Se actualiza cada vez que cambia el token guardado. */
+  function actualizarEnlaceCompartir() {
+    var token = getToken();
+    var bloque = document.getElementById("sync-share");
+    if (!token) { bloque.hidden = true; return; }
+    document.getElementById("sync-share-url").textContent =
+      location.origin + location.pathname + "#sync=" + token;
+    bloque.hidden = false;
+  }
+
   function initSync() {
     var panel = document.getElementById("sync-panel");
     var input = document.getElementById("token-input");
 
     document.getElementById("btn-sync").addEventListener("click", function () {
       panel.hidden = !panel.hidden;
-      if (!panel.hidden) setSyncStatus(getToken() ? "guardado" : "sin-token");
+      if (!panel.hidden) {
+        setSyncStatus(getToken() ? "guardado" : "sin-token");
+        actualizarEnlaceCompartir();
+      }
     });
 
     document.getElementById("btn-sync-save").addEventListener("click", function () {
@@ -178,6 +195,7 @@
       if (!valor) return;
       setToken(valor);
       input.value = "";
+      actualizarEnlaceCompartir();
       // Sube el estado actual ya mismo: así el token se valida al
       // momento en vez de esperar al próximo cambio.
       programarSubida();
@@ -187,7 +205,39 @@
       setToken("");
       input.value = "";
       setSyncStatus("sin-token");
+      actualizarEnlaceCompartir();
     });
+
+    document.getElementById("btn-sync-share-copy").addEventListener("click", function () {
+      var url = document.getElementById("sync-share-url").textContent;
+      var btn = document.getElementById("btn-sync-share-copy");
+      navigator.clipboard.writeText(url).then(function () {
+        var original = btn.textContent;
+        btn.textContent = "Copiado";
+        setTimeout(function () { btn.textContent = original; }, 1500);
+      }).catch(function () {});
+    });
+  }
+
+  /* Si la página se abre con "#sync=TOKEN" en la URL (el enlace que
+     genera actualizarEnlaceCompartir), guarda ese token en este
+     dispositivo y limpia el hash de la barra de direcciones — así el
+     token no se queda visible ahí ni viaja si luego se comparte o
+     guarda esa URL por error. */
+  var tokenPegadoPorEnlace = false;
+
+  function procesarEnlaceSync() {
+    if (location.hash.indexOf("sync=") === -1) return;
+    var token = new URLSearchParams(location.hash.slice(1)).get("sync");
+    if (!token) return;
+
+    setToken(token);
+    history.replaceState(null, "", location.pathname + location.search);
+    tokenPegadoPorEnlace = true;
+
+    document.getElementById("sync-panel").hidden = false;
+    setSyncStatus("guardado");
+    actualizarEnlaceCompartir();
   }
 
   // ============================================================
@@ -499,6 +549,13 @@
       renderAccordion(payload.list || []);
       renderMenu(payload.menu || []);
     });
+
+    // Si el token se acaba de guardar por el enlace de "#sync=", ya
+    // hay generated_at disponible: se valida subiendo el estado ya.
+    if (tokenPegadoPorEnlace) {
+      tokenPegadoPorEnlace = false;
+      programarSubida();
+    }
   }
 
   function load() {
@@ -523,6 +580,7 @@
       });
   }
 
+  procesarEnlaceSync();
   initSegmented();
   initSync();
   document.getElementById("btn-refresh").addEventListener("click", load);
