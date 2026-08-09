@@ -14,20 +14,23 @@
   "use strict";
 
   /* Color de acento por categoría (el punto junto al nombre en el
-     acordeón). Las claves son las mismas que CategoriaIngrediente en
+     acordeón). Se mantienen dentro de la misma familia de azules que
+     el resto de la web (index a cian), variando tono y luz lo justo
+     para distinguir una categoría de otra sin salirse de la paleta.
+     Las claves son las mismas que CategoriaIngrediente en
      core/models.py — si allí se añade una categoría nueva, aquí caería
-     en el gris de "otros" hasta que se le asigne un color. */
+     en el gris-azulado de "otros" hasta que se le asigne un color. */
   var CAT_COLORS = {
-    verduras: "#4b8b5f",
-    frutas: "#e0663f",
-    carne: "#b5533f",
-    pescado: "#3c7ea6",
-    lacteos_huevos: "#e0b94a",
-    pan_cereales: "#ad8a55",
-    legumbres_conservas: "#7d7440",
-    congelados: "#4fa3ab",
-    aceites_condimentos: "#cf8b2e",
-    otros: "#8a8f83"
+    verduras: "#4f8fff",
+    frutas: "#7c6bff",
+    carne: "#2f6fdb",
+    pescado: "#35b8c9",
+    lacteos_huevos: "#8fa8ff",
+    pan_cereales: "#4479c9",
+    legumbres_conservas: "#2c5aa8",
+    congelados: "#4fd0e8",
+    aceites_condimentos: "#5f7fcf",
+    otros: "#5b6478"
   };
 
   /* Qué ingredientes están marcados, y bajo qué clave de localStorage
@@ -220,16 +223,25 @@
     var highlight = document.getElementById("seg-highlight");
     var panels = { compra: document.getElementById("view-compra"), menu: document.getElementById("view-menu") };
 
-    buttons.forEach(function (btn, idx) {
-      btn.addEventListener("click", function () {
-        buttons.forEach(function (b) { b.setAttribute("aria-selected", "false"); });
-        btn.setAttribute("aria-selected", "true");
-        highlight.classList.toggle("pos-1", idx === 1);
-        Object.keys(panels).forEach(function (key) {
-          panels[key].hidden = key !== btn.dataset.view;
-        });
+    function seleccionar(btn, idx) {
+      buttons.forEach(function (b) { b.setAttribute("aria-selected", "false"); });
+      btn.setAttribute("aria-selected", "true");
+      highlight.classList.toggle("pos-1", idx === 1);
+      Object.keys(panels).forEach(function (key) {
+        panels[key].hidden = key !== btn.dataset.view;
       });
+    }
+
+    buttons.forEach(function (btn, idx) {
+      btn.addEventListener("click", function () { seleccionar(btn, idx); });
     });
+
+    // El resaltado se sitúa según qué botón trae aria-selected="true"
+    // en el propio HTML, en vez de asumir que siempre es el primero:
+    // así el orden de los botones en el marcado puede cambiar sin que
+    // la pastilla se quede desincronizada de la pestaña activa.
+    var inicial = buttons.findIndex(function (b) { return b.getAttribute("aria-selected") === "true"; });
+    seleccionar(buttons[inicial >= 0 ? inicial : 0], inicial >= 0 ? inicial : 0);
   }
 
   // ============================================================
