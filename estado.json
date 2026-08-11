@@ -2,6 +2,8 @@
   "generated_at": "2026-08-09T22:27:34",
   "compra": {},
   "menu": {
-    "Martes:cena": true
+    "Martes:cena": true,
+    "Lunes:comida": false,
+    "Lunes:cena": false
   }
 }
