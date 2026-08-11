@@ -1,6 +1,9 @@
 {
   "generated_at": "2026-08-09T22:27:34",
-  "compra": {},
+  "compra": {
+    "verduras:calabacín": true,
+    "verduras:patata": true
+  },
   "menu": {
     "Martes:cena": true,
     "Lunes:comida": false,
