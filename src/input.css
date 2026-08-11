@@ -1,0 +1,408 @@
+/* ============================================================
+   Fuente de Tailwind v4 — esto es lo que se edita.
+   ------------------------------------------------------------
+   style.css (en la carpeta de arriba) es el resultado COMPILADO
+   de este archivo: no se edita a mano. Para regenerarlo tras
+   tocar algo aquí:
+
+     tailwindcss -i web/src/input.css -o web/style.css --minify
+
+   (usando el binario standalone de Tailwind, sin necesitar
+   Node/npm — ver el README de la carpeta tools/ si hace falta
+   volver a descargarlo).
+
+   Se mantienen los mismos nombres de clase que la hoja de estilos
+   CSS original (.appbar, .item-row, .check-box...) en vez de
+   escribir utilidades sueltas en el HTML: así el HTML y el
+   app.js — que crea elementos con className a mano — no han
+   tenido que tocarse para esta migración, y cada componente
+   sigue teniendo un único sitio con su explicación al lado.
+   ============================================================ */
+@import "tailwindcss";
+
+/* ------------------------------------------------------------
+   Tokens de color
+   ------------------------------------------------------------
+   Identidad única a propósito: fondo negro y una familia de
+   azules (del índigo al cian), sin variante clara. Al declararlos
+   bajo --color-*, Tailwind genera solas las utilidades a juego
+   (bg-accent, text-muted, border-border...), usadas más abajo.
+
+   --bg/--surface/--surface-2 forman una escalera de tres oscuros
+   (fondo, tarjeta, elemento sobre la tarjeta) para que las
+   tarjetas se noten "elevadas" sobre el negro sin depender de
+   sombras oscuras, que en un fondo negro no se ven.
+
+   --danger es la única salida deliberada de la familia de
+   azules: un color de estado (error de red) tiene que
+   distinguirse del resto de la interfaz, así que no cuenta como
+   parte de la paleta "bonita", es semántica.
+   ------------------------------------------------------------ */
+@theme {
+  --color-bg: #05060a;
+  --color-surface: #0e131f;
+  --color-surface-2: #171f31;
+  --color-ink: #e8ecf6;
+  --color-muted: #7c8aa8;
+  --color-border: #1d2536;
+  --color-accent: #2f6bcf;        /* azul principal (probado con --color-accent-ink encima: ~5:1 de contraste) */
+  --color-accent-strong: #8fb2ff; /* azul claro, para texto sobre --color-bg (mejor legibilidad que --color-accent) */
+  --color-accent-ink: #ffffff;
+  --color-danger: #ef6a5f;
+  --color-focus: #8fb2ff;
+
+  --font-sans: -apple-system, "Segoe UI", "Helvetica Neue", Roboto, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Consolas, monospace;
+}
+
+/* Auxiliares que NO necesitan generar utilidades (no son colores
+   de fondo/texto/borde por sí mismos): solo se usan dentro de
+   box-shadow para simular elevación sobre negro con un resplandor
+   azulado (--glow) y un filo casi invisible arriba de cada
+   tarjeta (--hairline), en vez de una sombra oscura que no se
+   vería. Por eso viven en :root y no en @theme. */
+:root {
+  --glow: rgba(47, 107, 207, 0.24);
+  --hairline: rgba(255, 255, 255, 0.05);
+}
+
+/* ------------------------------------------------------------
+   Base
+   ------------------------------------------------------------ */
+* {
+  box-sizing: border-box;
+}
+
+/* El fondo va también en <html> para que no quede un borde del
+   color por defecto del navegador mientras carga el CSS. */
+html {
+  @apply bg-bg;
+}
+
+body {
+  @apply m-0 bg-bg text-ink font-sans text-[15px] leading-normal pt-7 px-4 pb-[60px];
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fuente monoespaciada para cifras (contadores, progreso): con
+   tabular-nums los dígitos no "bailan" de ancho al cambiar. */
+.mono {
+  @apply font-mono tabular-nums;
+}
+
+/* Columna única centrada: la web está pensada para verse en el
+   móvil, así que en pantallas grandes simplemente queda centrada
+   con ese mismo ancho en vez de estirarse. */
+.page {
+  @apply max-w-[460px] mx-auto;
+}
+
+/* ------------------------------------------------------------
+   Cabecera
+   ------------------------------------------------------------ */
+.appbar {
+  @apply flex items-baseline justify-between mb-[18px];
+}
+
+.brand {
+  @apply text-[12.5px] tracking-[0.09em] uppercase text-muted font-bold;
+}
+
+.appbar-actions {
+  @apply flex gap-4;
+}
+
+.refresh-btn {
+  @apply bg-transparent border-0 p-0 text-accent-strong text-[13px] font-semibold font-sans cursor-pointer;
+}
+
+/* ------------------------------------------------------------
+   Selector Compra / Menú
+   ------------------------------------------------------------
+   Dos botones sobre una pista; el "resaltado" es un div aparte
+   posicionado en absoluto que se desliza con transform, no un
+   fondo por botón. Al ser solo dos opciones de igual ancho basta
+   con alternar translateX(0%) / translateX(100%) — no hace falta
+   medir posiciones en JS.
+   ------------------------------------------------------------ */
+.segmented {
+  @apply relative grid grid-cols-2 bg-surface-2 rounded-[13px] p-1 mb-5;
+}
+
+.seg-highlight {
+  @apply absolute top-1 left-1 z-0 rounded-[10px] bg-accent
+         w-[calc(50%-4px)] h-[calc(100%-8px)]
+         transition-transform duration-[320ms] ease-in-out;
+  box-shadow: 0 2px 10px -2px var(--glow);
+}
+
+.seg-highlight.pos-1 {
+  @apply translate-x-full;
+}
+
+.seg-btn {
+  @apply relative z-[1] border-0 bg-transparent py-2.5 text-[14px] font-bold
+         text-muted cursor-pointer rounded-[9px] font-sans
+         transition-colors duration-[250ms];
+}
+
+.seg-btn[aria-selected="true"] {
+  @apply text-accent-ink;
+}
+
+/* ------------------------------------------------------------
+   Texto introductorio y tarjetas de estado
+   (cargando / sin lista / error de red)
+   ------------------------------------------------------------ */
+.lede {
+  @apply text-muted text-[13px] leading-[1.55] mt-0 mb-[18px];
+}
+
+.lede strong {
+  @apply text-ink font-semibold;
+}
+
+.state-card {
+  @apply bg-surface border border-border rounded-[14px] p-[22px]
+         text-[13.5px] text-muted leading-[1.6] text-center;
+}
+
+.state-card.error {
+  @apply border-danger text-danger;
+}
+
+/* Panel de sincronización: mismo look que .state-card pero
+   alineado a la izquierda (es un formulario, no un mensaje
+   centrado). */
+.sync-panel {
+  @apply text-left mb-4;
+}
+
+.sync-panel p {
+  @apply mt-0 mb-3 leading-[1.6];
+}
+
+.sync-panel code {
+  @apply text-accent-strong;
+}
+
+.token-input {
+  @apply block w-full bg-bg border border-border rounded-lg px-3 py-[11px]
+         text-ink font-mono text-[12.5px] mb-3;
+}
+
+.sync-actions {
+  @apply flex gap-4 mb-[10px];
+}
+
+.sync-status {
+  @apply text-[12px] m-0;
+}
+
+.sync-status.ok {
+  @apply text-accent-strong;
+}
+
+.sync-status.error {
+  @apply text-danger;
+}
+
+#sync-share {
+  @apply mt-[14px] pt-[14px] border-t border-border;
+}
+
+.sync-share-label {
+  @apply text-[12px] text-muted mb-2 mt-0;
+}
+
+.share-url {
+  @apply block w-full bg-bg border border-border rounded-lg px-3 py-[10px]
+         text-[11.5px] break-all text-muted mb-[10px];
+}
+
+/* ------------------------------------------------------------
+   Vista Compra: barra de progreso general
+   ------------------------------------------------------------ */
+.progress-card {
+  @apply bg-surface border border-border rounded-[14px] px-[18px] py-4 mb-4;
+  box-shadow: inset 0 1px 0 var(--hairline), 0 10px 24px -16px var(--glow);
+}
+
+.progress-row {
+  @apply flex justify-between items-baseline mb-[9px] text-[13px] text-muted;
+}
+
+.progress-track {
+  @apply h-2 rounded bg-surface-2 overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full rounded bg-accent transition-[width] duration-[400ms] ease-in-out;
+}
+
+/* ------------------------------------------------------------
+   Vista Compra: acordeón por categoría
+   ------------------------------------------------------------
+   Cada categoría es una tarjeta con una cabecera (botón) y un
+   panel. El panel usa el truco de animar grid-template-rows de
+   0fr a 1fr: permite una transición de alto suave sin tener que
+   medir scrollHeight en JS, y sin saltos si el contenido cambia.
+   ------------------------------------------------------------ */
+.cat-card {
+  @apply bg-surface border border-border rounded-[14px] mb-[10px];
+  box-shadow: inset 0 1px 0 var(--hairline), 0 10px 24px -16px var(--glow);
+}
+
+.cat-header {
+  /* quita el estilo nativo de <button> para maquetarlo como una fila */
+  all: unset;
+  @apply box-border flex items-center gap-3 w-full px-4 py-[15px] cursor-pointer;
+}
+
+.cat-dot {
+  @apply w-[10px] h-[10px] rounded-full shrink-0;
+}
+
+.cat-name {
+  @apply flex-1 text-[15px] font-semibold;
+}
+
+.cat-count {
+  @apply text-[12px] text-muted;
+}
+
+/* Flecha dibujada con dos bordes en L y rotada, en vez de un
+   glifo o un emoji: mismo grosor y color en los dos temas. */
+.chevron {
+  @apply w-[7px] h-[7px] shrink-0 -rotate-45 transition-transform duration-[250ms] mr-0.5;
+  border-right: 2px solid var(--color-muted);
+  border-bottom: 2px solid var(--color-muted);
+}
+
+.cat-header[aria-expanded="true"] .chevron {
+  @apply rotate-45;
+}
+
+.cat-panel {
+  display: grid;
+  grid-template-rows: 0fr; /* colapsado por defecto */
+  transition: grid-template-rows 0.3s ease;
+}
+
+.cat-panel.open {
+  grid-template-rows: 1fr;
+}
+
+/* overflow:hidden en el hijo (no en .cat-panel) es lo que hace
+   que el contenido no se vea mientras la fila mide 0fr. */
+.cat-panel-inner {
+  @apply overflow-hidden min-h-0;
+}
+
+.cat-items {
+  @apply px-4 pt-1 pb-2 border-t border-border;
+}
+
+:focus-visible {
+  @apply outline-2 outline-focus outline-offset-2;
+}
+
+/* ------------------------------------------------------------
+   Fila de ingrediente con casilla
+   ------------------------------------------------------------
+   El <input type="checkbox"> real se mantiene en el DOM (por
+   teclado/accesibilidad) pero oculto visualmente con "clip" en
+   vez de display:none, para que siga siendo enfocable. La caja
+   que se ve es un <span> hermano, pintado según el estado
+   :checked del input mediante el combinador ~.
+   ------------------------------------------------------------ */
+.item-row {
+  @apply flex items-center gap-3 py-[10px] px-0.5 cursor-pointer min-h-[46px]; /* min-h: objetivo táctil cómodo */
+}
+
+.item-row input {
+  @apply absolute w-px h-px overflow-hidden;
+  clip: rect(0 0 0 0);
+}
+
+.check-box {
+  @apply w-[21px] h-[21px] shrink-0 border border-border rounded-md relative bg-surface
+         transition-[background-color,border-color,scale] duration-150 ease-in-out;
+  border-width: 1.5px;
+}
+
+.item-row input:checked ~ .check-box {
+  @apply bg-accent border-accent scale-105; /* pequeño "pop" al marcar */
+}
+
+/* El check es un cuadrado con dos bordes formando una "L",
+   rotado 45°: mismo truco que la flecha del acordeón. */
+.check-box::after {
+  content: "";
+  @apply absolute w-1.5 h-[11px] opacity-0 transition-[opacity,transform] duration-[120ms] ease-in-out;
+  left: 6px;
+  top: 2px;
+  border: solid var(--color-accent-ink);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0.6);
+}
+
+.item-row input:checked ~ .check-box::after {
+  opacity: 1;
+  transform: rotate(45deg) scale(1);
+}
+
+.item-row input:focus-visible ~ .check-box {
+  @apply outline-2 outline-focus outline-offset-2;
+}
+
+.item-text {
+  @apply flex-1 min-w-0;
+}
+
+.item-name {
+  @apply text-[14.5px];
+}
+
+.item-who {
+  @apply text-[11.5px] text-muted mt-px; /* qué recetas lo necesitan */
+}
+
+.item-row input:checked ~ .item-text .item-name {
+  @apply line-through text-muted;
+}
+
+/* ------------------------------------------------------------
+   Vista Menú
+   ------------------------------------------------------------ */
+.day-card {
+  @apply bg-surface border border-border rounded-[14px] px-4 py-[14px] mb-[10px];
+  box-shadow: inset 0 1px 0 var(--hairline), 0 10px 24px -16px var(--glow);
+}
+
+.day-name {
+  @apply text-[11px] tracking-[0.07em] uppercase text-accent-strong font-bold mb-2;
+}
+
+/* Las franjas (Comida/Cena) dentro de cada tarjeta de día reutilizan
+   el componente .item-row / .check-box (definido más arriba, junto a
+   la lista de la compra): tocar una fila la tacha igual que marcar un
+   ingrediente comprado. */
+
+/* ------------------------------------------------------------
+   Animación de entrada y accesibilidad de movimiento
+   ------------------------------------------------------------ */
+#content {
+  animation: fade-in 0.25s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Quien haya pedido menos movimiento al sistema operativo no ve
+   ninguna transición ni animación de esta hoja de estilos. */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
